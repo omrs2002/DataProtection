@@ -4,6 +4,7 @@ using EmployeesApp.Models;
 using EmployeesApp.Contracts;
 using System;
 using Microsoft.AspNetCore.DataProtection;
+using System.Threading;
 
 namespace EmployeesApp.Controllers
 {
@@ -21,13 +22,28 @@ namespace EmployeesApp.Controllers
 
         public IActionResult Index()
         {
+            bool testProtcted = false;
             var employees = _repo.GetAll();
             foreach (var emp in employees)
             {
                 var stringId = emp.Id.ToString();
                 emp.EncryptedId = _protector.Protect(stringId);
             }
+            //return View(employees);
+
+            //Previous code removed for the example clarity
+            if (testProtcted)
+            {
+                var timeLimitedProtector = _protector.ToTimeLimitedDataProtector();
+                var timeLimitedData = timeLimitedProtector.Protect("Test timed protector", lifetime: TimeSpan.FromSeconds(2));
+                //just to test that this action works as long as life-time hasn't expired
+                var timedUnprotectedData = timeLimitedProtector.Unprotect(timeLimitedData);
+                Thread.Sleep(3000);
+                var anotherTimedUnprotectTry = timeLimitedProtector.Unprotect(timeLimitedData);
+            }
             return View(employees);
+
+
         }
 
         public IActionResult Details(string id)
@@ -35,6 +51,7 @@ namespace EmployeesApp.Controllers
             var guid_id = Guid.Parse(_protector.Unprotect(id));
             var employee = _repo.GetEmployee(guid_id);
             return View(employee);
+
         }
 
         public IActionResult Create()
@@ -46,7 +63,7 @@ namespace EmployeesApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Name,AccountNumber,Age")] Employee employee)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(employee);
             }
