@@ -56,8 +56,4 @@ services.AddDataProtection();
             var guid_id = Guid.Parse(_protector.Unprotect(id));
             var employee = _repo.GetEmployee(guid_id);
             return View(employee);
-        }
-  }
-  
-  
-
+        }}
