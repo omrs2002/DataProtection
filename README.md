@@ -9,13 +9,15 @@ https://code-maze.com/data-protection-aspnet-core/
 
 
 **in start up:**
+
 services.AddDataProtection();
 
 
 **In Controller:**
 
+
   public class EmployeesController : Controller
-    {
+  {
         private readonly IEmployeeRepository _repo;
         private readonly IDataProtector _protector;
 
@@ -24,7 +26,6 @@ services.AddDataProtection();
             _repo = repo;
             _protector = provider.CreateProtector("EmployeesApp.EmployeesController");
         }
-
 
         public IActionResult Index()
         {
@@ -48,8 +49,6 @@ services.AddDataProtection();
                 var anotherTimedUnprotectTry = timeLimitedProtector.Unprotect(timeLimitedData);
             }
             return View(employees);
-
-
         }
 
         public IActionResult Details(string id)
@@ -57,7 +56,8 @@ services.AddDataProtection();
             var guid_id = Guid.Parse(_protector.Unprotect(id));
             var employee = _repo.GetEmployee(guid_id);
             return View(employee);
-
         }
-}
+  }
+  
+  
 
